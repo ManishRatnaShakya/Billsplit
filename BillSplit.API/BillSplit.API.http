@@ -1,0 +1,6 @@
+@BillSplit.API_HostAddress = http://localhost:5003
+
+GET {{BillSplit.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

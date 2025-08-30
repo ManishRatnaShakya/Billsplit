@@ -1,0 +1,7 @@
+﻿services:
+  billsplit.api:
+    image: billsplit.api
+    build:
+      context: .
+      dockerfile: BillSplit.API/Dockerfile
+
