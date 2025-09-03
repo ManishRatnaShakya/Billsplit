@@ -1,5 +1,4 @@
 using BillSplit.Application.DTOs;
-using BillSplit.Application.Interfaces;
 using BillSplit.Application.Interfaces.Authentication;
 using BillSplit.Application.Interfaces.Common;
 using BillSplit.Application.Services;
@@ -36,9 +35,9 @@ public class UserServiceTests
     /// Test case for a successful user sign-up.
     /// Verifies that the service performs all the correct steps:
     /// 1. Checks if the user exists.
-    /// 2. Hashes the password.
-    /// 3. Adds the new user to the repository.
-    /// 4. Saves changes to the database.
+    /// 2. Hash the password.
+    /// 3. Add the new user to the repository.
+    /// 4. Save changes to the database.
     /// </summary>
     [Fact]
     public async Task SignUpAsync_ValidUser_AddsUserAndSavesChanges()
@@ -99,13 +98,13 @@ public class UserServiceTests
             Password = "HelloWorld"
         };
 
-        // Setup the user repository mock to return true for user existence
+        // Set up the user repository mock to return true for user existence
         _mockUserRepository.Setup(r => r.UserExistsAsync(signUpDto.Username))
             .ReturnsAsync(true);
 
         // Act & Assert
         // Verify that an exception is thrown with the expected message.
-        var exception = await Assert.ThrowsAsync<System.Exception>(() => _userService.SignUpAsync(signUpDto));
+        var exception = await Assert.ThrowsAsync<Exception>(() => _userService.SignUpAsync(signUpDto));
         Assert.Equal("Username already exists.", exception.Message);
 
         // Assert that no further methods were called after the user existence check failed.

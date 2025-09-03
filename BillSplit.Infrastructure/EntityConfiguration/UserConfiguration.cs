@@ -26,8 +26,15 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired() // Email cannot be null.
             .HasMaxLength(256); // A common standard for email length.
 
-        // The Email must be unique to prevent duplicate user accounts.
+        builder.Property(e => e.Username)
+            .IsRequired() // Username cannot be null.
+            .HasMaxLength(200);
+        
+        // The Email and Username must be unique to prevent duplicate user accounts.
         builder.HasIndex(e => e.Email)
+            .IsUnique();
+        
+        builder.HasIndex(u => u.Username)
             .IsUnique();
 
         // PasswordHash is required. Its length will depend on the hashing algorithm used.
@@ -36,10 +43,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         // The JoinedDate property is required and the value is generated in the application.
         builder.Property(e => e.JoinedDate)
-            .IsRequired();
-
-        // LastLoginDate property is required.
-        builder.Property(e => e.LastLoginDate)
             .IsRequired();
             
         // IsActive is a required boolean field.

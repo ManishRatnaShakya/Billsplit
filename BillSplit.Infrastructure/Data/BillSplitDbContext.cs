@@ -18,7 +18,7 @@ public class BillSplitDbContext(DbContextOptions<BillSplitDbContext> options) : 
     public DbSet<User> Users { get; set; }
 
     /// <summary>
-    /// Configures the model that was discovered by convention from the entity types
+    /// Configures the model discovered by convention from the entity types
     /// exposed in <see cref="DbSet{TEntity}"/> properties on this context.
     /// </summary>
     /// <param name="modelBuilder">The builder being used to construct the model for this context.</param>
