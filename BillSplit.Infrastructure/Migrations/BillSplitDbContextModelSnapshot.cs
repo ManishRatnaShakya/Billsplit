@@ -22,6 +22,27 @@ namespace BillSplit.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BillSplit.Domain.Entities.Group", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+                });
+
             modelBuilder.Entity("BillSplit.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -76,6 +97,53 @@ namespace BillSplit.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BillSplit.Domain.Entities.UserGroup", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId", "GroupId");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("UserGroups");
+                });
+
+            modelBuilder.Entity("BillSplit.Domain.Entities.UserGroup", b =>
+                {
+                    b.HasOne("BillSplit.Domain.Entities.Group", "Group")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BillSplit.Domain.Entities.User", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BillSplit.Domain.Entities.Group", b =>
+                {
+                    b.Navigation("UserGroups");
+                });
+
+            modelBuilder.Entity("BillSplit.Domain.Entities.User", b =>
+                {
+                    b.Navigation("UserGroups");
                 });
 #pragma warning restore 612, 618
         }

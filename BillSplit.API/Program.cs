@@ -1,4 +1,5 @@
 using BillSplit.Infrastructure.GlobalConfiguration;
+using BillSplit.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
@@ -7,6 +8,7 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"
 builder.Services.AddControllers();
 builder.Services.ServiceRegistration(connectionString);
 builder.Services.AddSwaggerConfig(builder.Configuration);
+builder.Services.AddJwtConfig(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {

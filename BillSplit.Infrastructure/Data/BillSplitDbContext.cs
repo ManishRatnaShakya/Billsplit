@@ -16,7 +16,11 @@ public class BillSplitDbContext(DbContextOptions<BillSplitDbContext> options) : 
     /// and it is typically used for querying and performing CRUD (Create, Read, Update, Delete) operations.
     /// </summary>
     public DbSet<User> Users { get; set; }
-
+    
+    public DbSet<Group> Groups { get; set; }
+    
+    public DbSet<UserGroup> UserGroups { get; set; }
+    
     /// <summary>
     /// Configures the model discovered by convention from the entity types
     /// exposed in <see cref="DbSet{TEntity}"/> properties on this context.

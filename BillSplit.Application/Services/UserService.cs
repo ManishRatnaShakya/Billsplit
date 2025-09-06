@@ -10,14 +10,31 @@ namespace BillSplit.Application.Services;
 /// <summary>
 /// Service class for user-related operations, handling business logic.
 /// </summary>
-public class UserService(IUserRepository userRepository, IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+public class UserService(IUserRepository userRepository,
+                            IUnitOfWork unitOfWork,
+                            IPasswordHasher passwordHasher,
+                            IJwtService jwtService)
     : IUserService
 {
-    public async Task LoginAsync(LoginDto loginDto)
-    {
-        
-    }
     
+    
+    public async Task<ResponseDTO> LoginAsync(LoginDto loginDto)
+    {
+        if (!await userRepository.UserExistsAsync(loginDto.Username))
+            throw new Exception("Username does not exist.");
+
+        var user = userRepository.GetUserByUsername(loginDto.Username);
+
+        var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.Password);
+        if (!passwordChecker)
+            throw new Exception("Invalid password.");
+        return new ResponseDTO()
+        {
+            data = jwtService.GenerateJwtToken(user),
+            message = "Login Successful"
+        };
+    }
+
     /// <summary>
     /// Registers a new user with the provided sign-up details.
     /// </summary>
@@ -51,6 +68,30 @@ public class UserService(IUserRepository userRepository, IUnitOfWork unitOfWork,
         userRepository.AddUser(user);
         
         // 4. Persist all changes (the new user) to the database within a single transaction.
+        await unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task UpdateUser(Guid id, UserUpdateDto userUpdateDto)
+    {
+        var currentActiveUser = userRepository.GetUserById(id);
+        
+        var updateProps = userUpdateDto.GetType().GetProperties();
+
+        foreach (var prop in updateProps)
+        {
+            var newValue = prop.GetValue(userUpdateDto); 
+            if (newValue != null) // only update if user provided data
+            {
+                var targetProp = currentActiveUser.GetType().GetProperty(prop.Name);
+
+                if (targetProp != null && targetProp.CanWrite) {
+                        targetProp.SetValue(currentActiveUser, newValue); 
+                } 
+            }
+        }
+
+        userRepository.UpdateUser(currentActiveUser);
+
         await unitOfWork.SaveChangesAsync();
     }
 }

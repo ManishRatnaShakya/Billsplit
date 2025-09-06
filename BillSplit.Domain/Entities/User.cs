@@ -13,4 +13,7 @@ public class User
     public DateTime JoinedDate { get; init; } = DateTime.UtcNow;
     public DateTime LastLoginDate { get; set; }
     public bool? IsActive { get; set; } = true;
+    
+    public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+
 }

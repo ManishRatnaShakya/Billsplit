@@ -34,5 +34,13 @@ namespace BillSplit.API.Controllers
             await userService.SignUpAsync(signUpDto);
             return Created("", new { Message = "User registered successfully." });
         }
+        
+        
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDto userUpdateDto)
+        {
+            await userService.UpdateUser(id, userUpdateDto);
+            return Created("", new { Message = "User updated successfully." });
+        }
     }
 }

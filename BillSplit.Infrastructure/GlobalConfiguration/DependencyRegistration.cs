@@ -21,6 +21,7 @@ public static class DependencyRegistration
         // Register services from the Application layer
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtService, JwtService>();
         // Register any other infrastructure services (like logging, caching, etc.)
         services.AddDbContext<BillSplitDbContext>(options =>
             options.UseNpgsql(connectionString,
