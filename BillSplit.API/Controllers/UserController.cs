@@ -20,9 +20,9 @@ namespace BillSplit.API.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             var token = await userService.LoginAsync(loginDto);
-            return Created("", new ResponseDto<string>(
+            return Created("", new ResponseDto<object>(
                 "Login Successful",
-                token
+                new { token = token }
             ));
         }
         
