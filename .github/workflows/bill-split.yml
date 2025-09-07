@@ -30,7 +30,11 @@ jobs:
       run: dotnet build BillSplit.sln --configuration Release --no-restore
 
     - name: Run .NET Tests
-      run: dotnet test BillSplit.sln --no-build --verbosity normal
+      run: |
+        dotnet test BillSplit.API.Tests/BillSplit.API.Tests.csproj --no-build --verbosity normal
+        dotnet test BillSplit.Application.Tests/BillSplit.Application.Tests.csproj --no-build --verbosity normal
+        dotnet test BillSplit.Infrastructure.Tests/BillSplit.Infrastructure.Tests.csproj --no-build --verbosity normal
+
 
     - name: Publish API
       run: dotnet publish BillSplit.API/BillSplit.API.csproj -c Release -o ./publish
