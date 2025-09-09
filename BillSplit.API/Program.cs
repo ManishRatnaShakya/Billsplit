@@ -9,15 +9,13 @@ builder.Services.AddControllers();
 builder.Services.ServiceRegistration(connectionString);
 builder.Services.AddSwaggerConfig(builder.Configuration);
 builder.Services.AddJwtConfig(builder.Configuration);
-
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddOpenApi();
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowSpecificOrigins", policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
@@ -25,7 +23,13 @@ if (builder.Environment.IsDevelopment())
     });
 }
 
+
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("AllowSpecificOrigins");
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

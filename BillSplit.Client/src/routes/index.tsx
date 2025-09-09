@@ -7,9 +7,8 @@ import {Homepage} from "../pages/Homepage/Homepage.tsx";
 
 // ✅ Simple auth check (using localStorage instead of Redux)
 function PrivateRoute({ children }: { children: JSX.Element }) {
-//  const token = localStorage.getItem("token");
-    const token = "randomtoken"
-  return token ? children : <Navigate to="/" replace />;
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/auth/login" replace />;
 }
 
 export default function AppRoutes() {
@@ -28,7 +27,7 @@ export default function AppRoutes() {
 
         {/* Protected dashboard */}
         <Route
-          path="/dashboard"
+          path="dashboard"
           element={
             <PrivateRoute>
                <AppLayout/>

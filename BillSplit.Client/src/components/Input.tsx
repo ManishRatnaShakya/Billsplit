@@ -5,7 +5,7 @@ type InputProps = {
     onChange?: (value: string) => void;
 };
 
-export function Input({ type, placeholder, value, onChange }: InputProps) {
+export default function Input({ type, placeholder, value, onChange}: InputProps) {
     return (
         <input
             type={type}

@@ -1,5 +1,5 @@
 export function AppLayout() {
     return (
-        <div></div>
+        <div>This is private dashboard</div>
     )
 }
