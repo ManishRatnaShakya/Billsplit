@@ -13,6 +13,7 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IPasswordHasher> _mockPasswordHasher;
+    private readonly Mock<IJwtService> _mockJwtService;
     private readonly UserService _userService;
 
     public UserServiceTests()
@@ -20,10 +21,12 @@ public class UserServiceTests
         _mockUserRepository = new Mock<IUserRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockPasswordHasher = new Mock<IPasswordHasher>();
+        _mockJwtService = new Mock<IJwtService>();
         _userService = new UserService(
             _mockUserRepository.Object,
             _mockUnitOfWork.Object,
-            _mockPasswordHasher.Object
+            _mockPasswordHasher.Object,
+            _mockJwtService.Object
         );
     }
 

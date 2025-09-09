@@ -19,8 +19,11 @@ namespace BillSplit.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            await userService.LoginAsync(loginDto);
-            return Created("", new { Message = "Login successfully." });
+            var token = await userService.LoginAsync(loginDto);
+            return Created("", new ResponseDto<object>(
+                "Login Successful",
+                new { token = token }
+            ));
         }
         
         /// <summary>

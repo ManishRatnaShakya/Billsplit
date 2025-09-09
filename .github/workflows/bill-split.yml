@@ -1,0 +1,46 @@
+name: CI - Build, Test, Publish
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout repository
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # ==============================
+    # Backend (.NET 9 API)
+    # ==============================
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore BillSplit.sln
+
+    - name: Build API & Libraries
+      run: dotnet build BillSplit.sln --configuration Release --no-restore
+
+    - name: Run .NET Tests
+      run: |
+        dotnet test BillSplit.sln --configuration Release  # Run tests
+
+    - name: Publish API
+      run: dotnet publish BillSplit.API/BillSplit.API.csproj -c Release -o ./publish
+
+    # ==============================
+    # Artifacts
+    # ==============================
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-publish
+        path: ./publish

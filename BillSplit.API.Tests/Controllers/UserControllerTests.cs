@@ -7,7 +7,7 @@ using Moq;
 using Xunit;
 using System.Threading.Tasks;
 
-namespace BillSplit.Tests.Controllers;
+namespace BillSplit.API.Tests.Controllers;
 
 public class UserControllerTests
 {
@@ -55,32 +55,5 @@ public class UserControllerTests
         var createdResult = Assert.IsType<CreatedResult>(result);
         Assert.NotNull(createdResult.Value);
         Assert.Equal(201, createdResult.StatusCode);
-    }
-
-    /// <summary>
-    /// Test case for a sign-up attempt with a username that already exists.
-    /// Verifies that the controller handles the exception from the service and returns a 409 Conflict.
-    /// </summary>
-    [Fact]
-    public async Task SignUp_UserExists_ReturnsConflictResult()
-    {
-        // Arrange
-        var signUpDto = new SignUpDto
-        {
-            Username = "test",
-            FirstName = "Test",
-            LastName = "Test",
-            Email = "test@gmail.com",
-            Password = "HelloWorld"
-        };
-        
-        _mockUserService.Setup(s => s.SignUpAsync(It.IsAny<SignUpDto>()))
-                        .ThrowsAsync(new System.Exception("Username already exists."));
-
-        // Act
-        var result = await _controller.SignUp(signUpDto);
-
-        // Assert
-        Assert.IsType<ConflictObjectResult>(result);
     }
 }

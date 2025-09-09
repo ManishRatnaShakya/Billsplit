@@ -1,13 +1,7 @@
 namespace BillSplit.Application.DTOs;
 
-public class ResponseDTO<T>
+public class ResponseDto<T>(string message, T data)
 {
-    public string message { get; set; }
-    public T data { get; set; }
-
-    public ResponseDTO(string message, T data)
-    {
-        message = message;
-        data = data;
-    }
+    public string Message { get; set; } = message;
+    public T Data { get; set; } = data;
 }

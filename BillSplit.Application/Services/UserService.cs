@@ -18,7 +18,7 @@ public class UserService(IUserRepository userRepository,
 {
     
     
-    public async Task<ResponseDTO> LoginAsync(LoginDto loginDto)
+    public async Task<string> LoginAsync(LoginDto loginDto)
     {
         if (!await userRepository.UserExistsAsync(loginDto.Username))
             throw new Exception("Username does not exist.");
@@ -28,11 +28,7 @@ public class UserService(IUserRepository userRepository,
         var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.Password);
         if (!passwordChecker)
             throw new Exception("Invalid password.");
-        return new ResponseDTO()
-        {
-            data = jwtService.GenerateJwtToken(user),
-            message = "Login Successful"
-        };
+        return jwtService.GenerateJwtToken(user);
     }
 
     /// <summary>
