@@ -7,6 +7,7 @@ import authService from "../../../services/auth.service.ts";
 import type {ISignIn} from "../../../interface/auth.interface.ts";
 import type {ApiResponse, ErrorResponse} from "../../../common/ApiResponse.type.ts";
 import type {LoginResponse} from "../../../types/auth.type.ts";
+import {useState} from "react";
 
 // ✅ Schema
 const userSchema = yup.object().shape({
@@ -17,6 +18,8 @@ const userSchema = yup.object().shape({
 export function LoginForm() {
 
     const navigate = useNavigate();
+    const [error, setError] = useState<{username: string, password: string}>();
+    
     const loginMutation = useMutation({
         mutationFn: authService.login,
         onSuccess: (response: ApiResponse<LoginResponse>) => {
@@ -25,7 +28,8 @@ export function LoginForm() {
             navigate('/dashboard');
         },
         onError: (error: ApiResponse<ErrorResponse>) => {
-            console.error("Login failed:", error.message);
+            setError(error.response.data.data);
+            console.log("Login failed:", error.message);
         },
     });
     const {
@@ -66,7 +70,8 @@ export function LoginForm() {
                                     <input
                                         type="text"
                                         placeholder="Username"
-                                        className="border rounded px-3 py-2 w-full"
+                                        onKeyUp={() => setError(undefined)}
+                                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                                         {...register("username")}
                                     />
                                     {errors.username && (
@@ -74,17 +79,28 @@ export function LoginForm() {
                                             {errors.username.message}
                                         </p>
                                     )}
+                                    {error && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {error.username}
+                                        </p>
+                                    )}
 
                                     {/* ✅ Password */}
                                     <input
                                         type="password"
                                         placeholder="Password"
-                                        className=" border rounded px-3 py-2 w-full mt-5"
+                                        onFocus={() => setError(undefined)}
+                                        className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                                         {...register("password")}
                                     />
                                     {errors.password && (
                                         <p className="text-red-500 text-xs mt-1">
                                             {errors.password.message}
+                                        </p>
+                                    )}
+                                    {error && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {error.password}
                                         </p>
                                     )}
 

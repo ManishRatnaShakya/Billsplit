@@ -16,15 +16,53 @@ namespace BillSplit.API.Controllers
         /// </summary>
         /// <param name="loginDto">The data transfer object containing login credentials.</param>
         /// <returns>An action result indicating the outcome of the login attempt.</returns>
+      
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var token = await userService.LoginAsync(loginDto);
-            return Created("", new ResponseDto<object>(
-                "Login Successful",
-                new { token = token }
-            ));
+            try
+            {
+                var token = await userService.LoginAsync(loginDto);
+
+                return Ok(new ResponseDto<object>(
+                    "Login successful",
+                    new { token }
+                ));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // custom message based on what the service threw
+                if (ex.Message.Contains("User not found"))
+                {
+                    return Unauthorized(new ResponseDto<object>(
+                        "Login failed",
+                        new { username = "User not found" }
+                    ));
+                }
+                if (ex.Message.Contains("Invalid password"))
+                {
+                    return Unauthorized(new ResponseDto<object>(
+                        "Login failed",
+                        new { password = "Password not correct" }
+                    ));
+                }
+
+                // fallback
+                return Unauthorized(new ResponseDto<object>(
+                    "Login failed",
+                    new { error = "Invalid credentials" }
+                ));
+            }
+            catch (Exception ex)
+            {
+                // generic fallback (server issue, not login issue)
+                return StatusCode(500, new ResponseDto<object>(
+                    "An unexpected error occurred",
+                    new { error = ex.Message }
+                ));
+            }
         }
+
         
         /// <summary>
         /// Registers a new user with the provided details.

@@ -21,13 +21,13 @@ public class UserService(IUserRepository userRepository,
     public async Task<string> LoginAsync(LoginDto loginDto)
     {
         if (!await userRepository.UserExistsAsync(loginDto.Username))
-            throw new Exception("Username does not exist.");
+            throw new UnauthorizedAccessException("User not found");
 
         var user = userRepository.GetUserByUsername(loginDto.Username);
 
         var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.Password);
         if (!passwordChecker)
-            throw new Exception("Invalid password.");
+            throw new UnauthorizedAccessException("Invalid password.");
         return jwtService.GenerateJwtToken(user);
     }
 
