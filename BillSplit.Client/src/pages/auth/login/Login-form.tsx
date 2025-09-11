@@ -1,9 +1,12 @@
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios";
-import { Router } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
+import {useMutation} from "@tanstack/react-query";
+import authService from "../../../services/auth.service.ts";
+import type {ISignIn} from "../../../interface/auth.interface.ts";
+import type {ApiResponse, ErrorResponse} from "../../../common/ApiResponse.type.ts";
+import type {LoginResponse} from "../../../types/auth.type.ts";
 
 // ✅ Schema
 const userSchema = yup.object().shape({
@@ -11,35 +14,34 @@ const userSchema = yup.object().shape({
     password: yup.string().required("Password is required"),
 });
 
-type FormData = yup.InferType<typeof userSchema>;
-
 export function LoginForm() {
+
     const navigate = useNavigate();
+    const loginMutation = useMutation({
+        mutationFn: authService.login,
+        onSuccess: (response: ApiResponse<LoginResponse>) => {
+            console.log(response);
+            localStorage.setItem("token", response.data.data.token);
+            navigate('/dashboard');
+        },
+        onError: (error: ApiResponse<ErrorResponse>) => {
+            console.error("Login failed:", error.message);
+        },
+    });
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<FormData>({
+    } = useForm<ISignIn>({
         resolver: yupResolver(userSchema),
     });
 
-    // ✅ Submit handler
-    const  onSubmit = async (data: FormData) => {
+    const  onSubmit = async (data: ISignIn) => {
         try {
-            const response = await axios.post("http://localhost:5003/api/User/Login", data);
-
-            const token = response.data.data.token; // adjust this key to match your backend
-            console.log(token);
-            localStorage.setItem("token", token);
-            console.log("Login success:", response.data);
-
-            navigate("/dashboard");
-        } catch (error: any) {
-            if (axios.isAxiosError(error)) {
-                console.error("Login failed:", error.response?.data || error.message);
-            } else {
-                console.error("Unexpected error:", error);
-            }
+          await loginMutation.mutate(data);
+        }
+        catch (error) {
+            console.log(error);
         }
     };
 
