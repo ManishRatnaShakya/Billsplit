@@ -5,6 +5,7 @@ using BillSplit.Application.Services;
 using BillSplit.Domain.Interfaces.Repos;
 using BillSplit.Infrastructure.Data;
 using BillSplit.Infrastructure.Data.Repos;
+using BillSplit.Infrastructure.Persistence;
 using BillSplit.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

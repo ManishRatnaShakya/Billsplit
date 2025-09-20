@@ -1,13 +1,20 @@
-namespace BillSplit.Domain.Entities;
-
-public class UserGroup
+namespace BillSplit.Domain.Entities
 {
-    public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
+    public class UserGroup
+    {
+        // Composite Primary Key will be (UserId + GroupId)
 
-    public Guid GroupId { get; set; }
-    public Group Group { get; set; } = null!;
+        public Guid UserId { get; set; }    // FK to User
+        public Guid GroupId { get; set; }   // FK to Group
 
-    // Extra columns if needed
-    public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+        // Additional fields
+        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+
+        public string Role { get; set; } = "Member"; 
+        // Example roles: Admin, Member, Viewer
+
+        // Navigation Properties
+        public virtual User User { get; set; } = null!;
+        public virtual Group Group { get; set; } = null!;
+    }
 }

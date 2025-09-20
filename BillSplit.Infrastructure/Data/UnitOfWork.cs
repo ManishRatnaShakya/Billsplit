@@ -1,4 +1,5 @@
 using BillSplit.Application.Interfaces.Common;
+using BillSplit.Infrastructure.Persistence;
 
 namespace BillSplit.Infrastructure.Data;
 

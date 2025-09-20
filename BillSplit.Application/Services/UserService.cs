@@ -25,7 +25,7 @@ public class UserService(IUserRepository userRepository,
 
         var user = userRepository.GetUserByUsername(loginDto.Username);
 
-        var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.Password);
+        var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.PasswordHash);
         if (!passwordChecker)
             throw new UnauthorizedAccessException("Invalid password.");
         return jwtService.GenerateJwtToken(user);
@@ -51,13 +51,11 @@ public class UserService(IUserRepository userRepository,
         // 3. Create a new User entity from the DTO and assign the hashed password.
         var user = new User
         {
-            Username = userDto.Username,
+            FullName = userDto.Username,
             Email = userDto.Email,
-            Password = passwordHash,
-            FirstName = userDto.FirstName,
-            LastName = userDto.LastName,
+            PasswordHash = passwordHash,
+            ProfileImage = userDto.LastName,
             PhoneNumber = userDto.PhoneNumber,
-            PhoneCountryCode = userDto.PhoneCountryCode,
         };
         
         // Add the new user entity to the repository's change tracker.

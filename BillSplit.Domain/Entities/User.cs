@@ -1,19 +1,27 @@
-namespace BillSplit.Domain.Entities;
-
-public class User
+namespace BillSplit.Domain.Entities
 {
-    public Guid Id { get; init; } = Guid.NewGuid();
-    public required string Username { get; set; } 
-    public string? FirstName { get; set; } 
-    public string? LastName { get; set; } 
-    public string? Email { get; set; }
-    public string? Password { get; set; }
-    public string? PhoneNumber { get; set; }
-    public string? PhoneCountryCode { get; set; }
-    public DateTime JoinedDate { get; init; } = DateTime.UtcNow;
-    public DateTime LastLoginDate { get; set; }
-    public bool? IsActive { get; set; } = true;
-    
-    public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+    public class User
+    {
+        // Primary Key
+        public Guid UserId { get; set; }
 
+        // Basic Info
+        public string FullName { get; set; } = string.Empty;
+
+        public string Email { get; set; } = string.Empty;
+
+        public string PasswordHash { get; set; } = string.Empty;
+
+        public string? PhoneNumber { get; set; }
+
+        public string? ProfileImage { get; set; }
+
+        // Status
+        public bool IsActive { get; set; } = true;
+
+        // Timestamps
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

@@ -2,57 +2,47 @@ using BillSplit.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace BillSplit.Infrastructure.EntityConfiguration;
-
-public class UserConfiguration : IEntityTypeConfiguration<User>
+namespace BillSplit.Infrastructure.EntityConfiguration
 {
-    // The Configure method is where you place all the validation and
-    // relationship mapping for a single entity.
-    public void Configure(EntityTypeBuilder<User> builder)
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        // Set the primary key.
-        builder.HasKey(e => e.Id);
+        public void Configure(EntityTypeBuilder<User> builder)
+        {
+            builder.ToTable("Users");
 
-        // Configure properties with validation rules.
-        builder.Property(e => e.FirstName)
-            .IsRequired() // Name cannot be null.
-            .HasMaxLength(100);
-        
-        builder.Property(e => e.FirstName)
-            .IsRequired() // Name cannot be null.
-            .HasMaxLength(100);
+            builder.HasKey(u => u.UserId);
 
-        builder.Property(e => e.Email)
-            .IsRequired() // Email cannot be null.
-            .HasMaxLength(256); // A common standard for email length.
+            builder.Property(u => u.FullName)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        builder.Property(e => e.Username)
-            .IsRequired() // Username cannot be null.
-            .HasMaxLength(200);
-        
-        // The Email and Username must be unique to prevent duplicate user accounts.
-        builder.HasIndex(e => e.Email)
-            .IsUnique();
-        
-        builder.HasIndex(u => u.Username)
-            .IsUnique();
+            builder.Property(u => u.Email)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        // PasswordHash is required. Its length will depend on the hashing algorithm used.
-        builder.Property(e => e.Password)
-            .IsRequired();
+            builder.HasIndex(u => u.Email).IsUnique();
 
-        // The JoinedDate property is required and the value is generated in the application.
-        builder.Property(e => e.JoinedDate)
-            .IsRequired();
-            
-        // IsActive is a required boolean field.
-        builder.Property(e => e.IsActive)
-            .IsRequired();
+            builder.Property(u => u.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(256);
 
-        // These properties are optional but have a maximum length.
-        builder.Property(e => e.PhoneNumber)
-            .HasMaxLength(15);
-        builder.Property(e => e.PhoneCountryCode)
-            .HasMaxLength(4);
+            builder.Property(u => u.PhoneNumber)
+                .HasMaxLength(20);
+
+            builder.Property(u => u.ProfileImage)
+                .HasMaxLength(255);
+
+            builder.Property(u => u.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            builder.Property(u => u.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("NOW()");
+
+            builder.Property(u => u.UpdatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("NOW()");
+        }
     }
 }
