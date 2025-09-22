@@ -1,16 +1,13 @@
 export interface ISignUp {
     email: string;
-    username: string;
-    firstName: string;
-    lastName: string;
+    fullname: string;
     password: string;
     confirmPassword: string;
     PhoneNumber: string;
-    PhoneCountryCode: string;
 }
 
 export interface ISignIn {
-    username: string;
+    email: string;
     password: string;
 }
 

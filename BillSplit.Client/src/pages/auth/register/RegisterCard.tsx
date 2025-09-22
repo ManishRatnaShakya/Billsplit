@@ -5,19 +5,15 @@ import authService from "../../../services/auth.service.ts";
 import type {ISignUp} from "../../../interface/auth.interface.ts";
 
 
-// ✅ Define Yup schema
 const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
-    username: yup.string().required("Username is required"),
-    firstName: yup.string().required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
+    fullname: yup.string().required("Username is required"),
     password: yup.string().min(6, "Password must be at least 6 chars").required(),
     confirmPassword: yup
         .string()
         .oneOf([yup.ref("password"), ""], "Passwords must match")
         .required("Confirm password is required"),
     PhoneNumber: yup.string().required("Phone number is required"),
-    PhoneCountryCode: yup.string().required("Country code is required"),
 });
 
 export default function RegistrationCard() {
@@ -85,41 +81,28 @@ export default function RegistrationCard() {
                         
                         <form
                             className="w-full flex-1 mt-8"
-                            onSubmit={onSubmit}
-                        >
+                            onSubmit={onSubmit}>
                             <div className="mx-auto max-w-xs">
                                 <input
                                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                                    type="email" placeholder="Email"/>
-
-                                <input
-                                    type="text"
-                                    placeholder="Username"
-                                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                                    {...register("username")}
+                                    type="email"
+                                    placeholder="Email"
+                                    {...register("email")}
                                 />
-                                {errors.username && (
-                                    <p className="text-red-500 text-xs">{errors.username.message}</p>
+                                {errors.email && (
+                                    <p className="text-red-500 text-xs">{errors.email.message}</p>
                                 )}
 
                                 <input
                                     type="text"
-                                    placeholder="first name"
+                                    placeholder="Full Name"
                                     className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                                    {...register("firstName")}
+                                    {...register("fullname")}
                                 />
-                                {errors.firstName && (
-                                    <p className="text-red-500 text-xs">{errors.firstName.message}</p>
+                                {errors.fullname && (
+                                    <p className="text-red-500 text-xs">{errors.fullname.message}</p>
                                 )}
-                                <input
-                                    type="text"
-                                    placeholder="LastName"
-                                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                                    {...register("lastName")}
-                                />
-                                {errors.lastName && (
-                                    <p className="text-red-500 text-xs">{errors.lastName.message}</p>
-                                )}
+
                                 <input
                                     type="password"
                                     placeholder="Password"
@@ -156,17 +139,7 @@ export default function RegistrationCard() {
                                     </p>
                                 )}
 
-                                <input
-                                    type="text"
-                                    placeholder="Country Code"
-                                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                                    {...register("PhoneCountryCode")}
-                                />
-                                {errors.PhoneCountryCode && (
-                                    <p className="text-red-500 text-xs">
-                                        {errors.PhoneCountryCode.message}
-                                    </p>
-                                )}
+                                
 
                                 <button
                                     type="submit"

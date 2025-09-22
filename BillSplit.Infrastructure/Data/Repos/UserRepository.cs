@@ -18,6 +18,9 @@ public class UserRepository(BillSplitDbContext context) : IUserRepository
     
     public User GetUserById(Guid id) =>
         context.Users.Find(id);
+    
+    public Task<User> GetByEmailAsync(string email) => 
+        context.Users.FirstOrDefaultAsync(u => u.Email == email);
     public User GetUserByUsername(string username) => 
         context.Users.FirstOrDefault(u => u.FullName == username);
 }

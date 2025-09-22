@@ -1,4 +1,5 @@
 using BillSplit.Application.DTOs;
+using BillSplit.Application.DTOs.Common;
 using BillSplit.Application.Interfaces;
 using BillSplit.Application.Interfaces.Authentication;
 using BillSplit.Application.Interfaces.Common;
@@ -18,51 +19,70 @@ public class UserService(IUserRepository userRepository,
 {
     
     
-    public async Task<string> LoginAsync(LoginDto loginDto)
+    public async Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginDto loginDto)
     {
-        if (!await userRepository.UserExistsAsync(loginDto.Username))
-            throw new UnauthorizedAccessException("User not found");
+        var user = await userRepository.GetByEmailAsync(loginDto.Email);
 
-        var user = userRepository.GetUserByUsername(loginDto.Username);
+        if (user == null)
+            return ApiResponse<LoginResponseDto>.FailureResponse("User not found");
 
-        var passwordChecker = passwordHasher.VerifyPassword(loginDto.Password, user.PasswordHash);
-        if (!passwordChecker)
-            throw new UnauthorizedAccessException("Invalid password.");
-        return jwtService.GenerateJwtToken(user);
+        // ✅ Correct parameter order
+        if (!passwordHasher.VerifyPassword(loginDto.Password, user.PasswordHash))
+            return ApiResponse<LoginResponseDto>.FailureResponse("Invalid password");
+
+        var token = jwtService.GenerateJwtToken(user);
+
+        var responseDto = new LoginResponseDto
+        {
+            Token = token,
+            Email = user.Email,
+            Fullname = user.FullName
+        };
+
+        return ApiResponse<LoginResponseDto>.SuccessResponse(responseDto, "Login successful");
     }
 
-    /// <summary>
-    /// Registers a new user with the provided sign-up details.
-    /// </summary>
-    /// <param name="userDto">The data transfer object containing user sign-up information.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="Exception">Thrown if the username already exists.</exception>
-    public async Task SignUpAsync(SignUpDto userDto)
+    public async Task<ApiResponse<SignUpDto>> SignUpAsync(SignUpDto userDto)
     {
-        // 1. Check if a user with the given username already exists to prevent duplicates.
-        if (await userRepository.UserExistsAsync(userDto.Username))
+        // 1. Check if user already exists
+        if (await userRepository.UserExistsAsync(userDto.Email))
         {
-            throw new Exception("Username already exists.");
+            return ApiResponse<SignUpDto>.FailureResponse("User with this email already exists.");
         }
-        
-        // 2. Securely hash the plain-text password before storing it in the database.
+
+        // 2. Securely hash the password using BCrypt
         var passwordHash = passwordHasher.HashPassword(userDto.Password);
-        
-        // 3. Create a new User entity from the DTO and assign the hashed password.
+
+        // 3. Create new user entity
         var user = new User
         {
-            FullName = userDto.Username,
+            UserId = Guid.NewGuid(),
+            FullName = userDto.FullName,
             Email = userDto.Email,
-            PasswordHash = passwordHash,
-            ProfileImage = userDto.LastName,
+            PasswordHash = passwordHash, // ✅ Store only the hashed password
+            ProfileImage = userDto.ProfileImage,
             PhoneNumber = userDto.PhoneNumber,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
-        
-        // Add the new user entity to the repository's change tracker.
+
+        // 4. Add to repository
         userRepository.AddUser(user);
-        
-        // 4. Persist all changes (the new user) to the database within a single transaction.
+
+        // 5. Commit transaction
         await unitOfWork.SaveChangesAsync();
+
+        // 6. Prepare response DTO (don’t return the password)
+        var responseDto = new SignUpDto
+        {
+            FullName = user.FullName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            ProfileImage = user.ProfileImage
+        };
+
+        return ApiResponse<SignUpDto>.SuccessResponse(responseDto, "User registered successfully!");
     }
 
     public async Task UpdateUser(Guid id, UserUpdateDto userUpdateDto)

@@ -1,4 +1,5 @@
 using BillSplit.Application.DTOs;
+using BillSplit.Application.DTOs.Common;
 using BillSplit.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,48 +21,19 @@ namespace BillSplit.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            try
-            {
-                var token = await userService.LoginAsync(loginDto);
+            var response = await userService.LoginAsync(loginDto);
 
-                return Ok(new ResponseDto<object>(
-                    "Login successful",
-                    new { token }
-                ));
-            }
-            catch (UnauthorizedAccessException ex)
+            if (!response.Success)
             {
-                // custom message based on what the service threw
-                if (ex.Message.Contains("User not found"))
-                {
-                    return Unauthorized(new ResponseDto<object>(
-                        "Login failed",
-                        new { username = "User not found" }
-                    ));
-                }
-                if (ex.Message.Contains("Invalid password"))
-                {
-                    return Unauthorized(new ResponseDto<object>(
-                        "Login failed",
-                        new { password = "Password not correct" }
-                    ));
-                }
+                // return 401 Unauthorized with consistent response
+                return Unauthorized(response);
+            }
 
-                // fallback
-                return Unauthorized(new ResponseDto<object>(
-                    "Login failed",
-                    new { error = "Invalid credentials" }
-                ));
-            }
-            catch (Exception ex)
-            {
-                // generic fallback (server issue, not login issue)
-                return StatusCode(500, new ResponseDto<object>(
-                    "An unexpected error occurred",
-                    new { error = ex.Message }
-                ));
-            }
+            // return 200 OK with token
+            return Ok(response);
         }
+
+
 
         
         /// <summary>
@@ -69,12 +41,21 @@ namespace BillSplit.API.Controllers
         /// </summary>
         /// <param name="signUpDto">The data transfer object containing user sign-up information.</param>
         /// <returns>An action result indicating the outcome of the registration.</returns>
-        [HttpPost("signUp")]
+        [HttpPost("register")]
         public async Task<IActionResult> SignUp([FromBody] SignUpDto signUpDto)
         {
-            await userService.SignUpAsync(signUpDto);
-            return Created("", new { Message = "User registered successfully." });
+            var response = await userService.SignUpAsync(signUpDto);
+
+            if (!response.Success)
+            {
+                // If failure, return 400 Bad Request with consistent API response
+                return BadRequest(response);
+            }
+
+            // On success, return 201 Created with response
+            return CreatedAtAction(nameof(SignUp), new { id = response.Data?.Email }, response);
         }
+
         
         
         [HttpPatch("update")]

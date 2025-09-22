@@ -9,6 +9,6 @@ public interface IUserRepository
     
     User GetUserById(Guid id);
     
-    User GetUserByUsername(string username);
+    Task<User> GetByEmailAsync(string username);
     void UpdateUser(User user);
 }

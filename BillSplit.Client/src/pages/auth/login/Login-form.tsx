@@ -1,37 +1,37 @@
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigate} from "react-router-dom";
-import {useMutation} from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import authService from "../../../services/auth.service.ts";
-import type {ISignIn} from "../../../interface/auth.interface.ts";
-import type {ApiResponse, ErrorResponse} from "../../../common/ApiResponse.type.ts";
-import type {LoginResponse} from "../../../types/auth.type.ts";
-import {useState} from "react";
+import type { ISignIn } from "../../../interface/auth.interface.ts";
+import type { ApiResponse, ErrorResponse } from "../../../common/ApiResponse.type.ts";
+import type { LoginResponse } from "../../../types/auth.type.ts";
+import { useState } from "react";
 
 // ✅ Schema
 const userSchema = yup.object().shape({
-    username: yup.string().required("Username is required"),
+    email: yup.string().email("Invalid email").required("Email is required"),
     password: yup.string().required("Password is required"),
 });
 
 export function LoginForm() {
-
     const navigate = useNavigate();
-    const [error, setError] = useState<{username: string, password: string}>();
-    
-    const loginMutation = useMutation({
+    const [error, setError] = useState<{ email?: string; password?: string } | undefined>();
+
+    // ✅ Login Mutation
+    const loginMutation = useMutation<ApiResponse<LoginResponse>, ErrorResponse, ISignIn>({
         mutationFn: authService.login,
-        onSuccess: (response: ApiResponse<LoginResponse>) => {
-            console.log(response);
-            localStorage.setItem("token", response.data.data.token);
-            navigate('/dashboard');
+        onSuccess: (response) => {
+            localStorage.setItem("token", response.data.token);
+            navigate("/dashboard");
         },
-        onError: (error: ApiResponse<ErrorResponse>) => {
-            setError(error.response.data.data);
-            console.log("Login failed:", error.message);
+        onError: (err) => {
+            console.error("Login failed:", err);
+            setError({ email: err?.message || "Invalid credentials" });
         },
     });
+
     const {
         register,
         handleSubmit,
@@ -40,12 +40,12 @@ export function LoginForm() {
         resolver: yupResolver(userSchema),
     });
 
-    const  onSubmit = async (data: ISignIn) => {
+    const onSubmit = (data: ISignIn) => {
         try {
-          await loginMutation.mutate(data);
+            loginMutation.mutate(data);
         }
-        catch (error) {
-            console.log(error);
+        catch (error: any)  {
+            setError(error.message); // reset custom error before submitting
         }
     };
 
@@ -57,6 +57,7 @@ export function LoginForm() {
                         <img
                             src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
                             className="w-32 mx-auto"
+                            alt="logo"
                         />
                     </div>
 
@@ -69,20 +70,16 @@ export function LoginForm() {
                                     {/* ✅ Email */}
                                     <input
                                         type="text"
-                                        placeholder="Username"
+                                        placeholder="Email"
                                         onKeyUp={() => setError(undefined)}
                                         className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
-                                        {...register("username")}
+                                        {...register("email")}
                                     />
-                                    {errors.username && (
-                                        <p className="text-red-500 text-xs mt-1">
-                                            {errors.username.message}
-                                        </p>
+                                    {errors.email && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
                                     )}
-                                    {error && (
-                                        <p className="text-red-500 text-xs mt-1">
-                                            {error.username}
-                                        </p>
+                                    {error?.email && (
+                                        <p className="text-red-500 text-xs mt-1">{error.email}</p>
                                     )}
 
                                     {/* ✅ Password */}
@@ -94,34 +91,19 @@ export function LoginForm() {
                                         {...register("password")}
                                     />
                                     {errors.password && (
-                                        <p className="text-red-500 text-xs mt-1">
-                                            {errors.password.message}
-                                        </p>
+                                        <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
                                     )}
-                                    {error && (
-                                        <p className="text-red-500 text-xs mt-1">
-                                            {error.password}
-                                        </p>
+                                    {error?.password && (
+                                        <p className="text-red-500 text-xs mt-1">{error.password}</p>
                                     )}
 
                                     {/* ✅ Submit */}
                                     <button
                                         type="submit"
+                                        disabled={loginMutation.isPending}
                                         className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                                     >
-                                        <svg
-                                            className="w-6 h-6 -ml-2"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                                            <circle cx="8.5" cy="7" r="4" />
-                                            <path d="M20 8v6M23 11h-6" />
-                                        </svg>
-                                        <span className="ml-3">Sign In</span>
+                                        {loginMutation.isPending ? "Signing in..." : "Sign In"}
                                     </button>
                                 </div>
                             </form>

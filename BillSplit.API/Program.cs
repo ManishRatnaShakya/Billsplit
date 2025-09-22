@@ -26,10 +26,6 @@ if (builder.Environment.IsDevelopment())
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("AllowSpecificOrigins");
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -39,6 +35,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseCors("AllowSpecificOrigins");
 }
+
+
+app.UseCors("AllowSpecificOrigins");
+
 
 app.UseHttpsRedirection();
 
