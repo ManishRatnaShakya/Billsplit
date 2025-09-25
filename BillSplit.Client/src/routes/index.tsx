@@ -2,9 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Register from "../pages/auth/register"
 import type { JSX } from "react";
 import Login from "../pages/auth/login";
-import {AppLayout} from "../layouts/AppLayout.tsx";
 import {Homepage} from "../pages/Homepage/Homepage.tsx";
-
+import AppLayout from "../layouts/AppLayout.tsx";
 // ✅ Simple auth check (using localStorage instead of Redux)
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const token = localStorage.getItem("token");
@@ -12,6 +11,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 }
 
 export default function AppRoutes() {
+    
   return (
     <BrowserRouter>
       <Routes>
