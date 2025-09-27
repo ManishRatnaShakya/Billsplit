@@ -10,7 +10,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import AppTheme from "./theme/AppTheme.tsx";
 import Box from "@mui/material/Box";
 import Header from "../components/Header.tsx";
-import MainGrid from "../components/MainGrid.tsx";
+
+import { Outlet } from "react-router-dom";
 
 import {
     chartsCustomizations,
@@ -47,14 +48,13 @@ export default function AppLayout(props: { disableCustomTheme?: boolean }) {
                     <Stack
                         spacing={2}
                         sx={{
-                            alignItems: 'center',
                             mx: 3,
                             pb: 5,
                             mt: { xs: 8, md: 0 },
                         }}
                     >
                         <Header />
-                        <MainGrid />
+                        <Outlet />
                     </Stack>
                 </Box>
             </Box>

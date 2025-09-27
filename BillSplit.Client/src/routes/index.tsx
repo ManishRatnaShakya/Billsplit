@@ -1,42 +1,44 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Register from "../pages/auth/register"
-import type { JSX } from "react";
 import Login from "../pages/auth/login";
 import {Homepage} from "../pages/Homepage/Homepage.tsx";
 import AppLayout from "../layouts/AppLayout.tsx";
+import MainGrid from "../components/MainGrid.tsx";
+import Friends from "../pages/Friends/Friends.tsx";
+import {Trips} from "../pages/Trips/Trips.tsx";
+import { Analytics } from "../pages/Analytics/Analytics.tsx";
+import { Settings } from "../pages/Settings/Settings.tsx";
 // ✅ Simple auth check (using localStorage instead of Redux)
-function PrivateRoute({ children }: { children: JSX.Element }) {
-  const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/auth/login" replace />;
+export  function PrivateRoute() {
+    const token = localStorage.getItem("token");
+    return token ? <Outlet /> : <Navigate to="/auth/login" replace />;
 }
-
 export default function AppRoutes() {
     
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* auth routes */}
-          
-       <Route path="/" element={<Homepage />} />
-          
-       <Route path="auth">
-            <Route index element={<Navigate to="login" replace />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-        </Route>
+      <BrowserRouter>
+          <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Homepage />} />
+              <Route path="auth">
+                  <Route index element={<Navigate to="login" replace />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
+              </Route>
+              {/* Protected routes */}
+              <Route element={<PrivateRoute />}>
+                  <Route element={<AppLayout />}>
+                      <Route path="dashboard" element={<MainGrid />} />
+                      <Route path="friends" element={<Friends />} />
+                      <Route path="trips" element={<Trips />} />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="settings" element={<Settings />} />
+                  </Route>
+              </Route>
 
-        {/* Protected dashboard */}
-        <Route
-          path="dashboard"
-          element={
-            <PrivateRoute>
-               <AppLayout/>
-            </PrivateRoute>
-          }
-        />
-        {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+      </BrowserRouter>
   );
 }
